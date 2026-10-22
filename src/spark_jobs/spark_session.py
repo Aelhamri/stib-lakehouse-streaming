@@ -18,5 +18,6 @@ def build_spark(app_name: str) -> SparkSession:
         SparkSession.builder
         .master("local[*]")
         .appName(app_name)
+        .config("spark.sql.session.timeZone", "UTC")
         .getOrCreate()
     )
