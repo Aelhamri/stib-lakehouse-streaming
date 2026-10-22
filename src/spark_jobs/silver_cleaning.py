@@ -26,19 +26,20 @@ def parse_bronze(bronze: DataFrame) -> DataFrame:
         | F.col("j.pointId").isNull()
         | F.col("j.distanceFromPoint").isNull()
     )
-    fingerprint = F.sha2(
-    F.concat_ws(
-        "|",
-        F.col("j.poll_ts"), F.col("j.lineid"), F.col("j.directionId"),
-        F.col("j.pointId"), F.col("j.distanceFromPoint").cast("string"),
-    ),
-    256,
+
+    # Empreinte du contenu. Ce n'est PAS un identifiant unique : plusieurs véhicules
+    # peuvent avoir exactement les mêmes valeurs (ex. à l'arrêt, distance 0).
+    obs_key = F.sha2(
+        F.concat_ws(
+            "|",
+            F.col("j.poll_ts"), F.col("j.lineid"), F.col("j.directionId"),
+            F.col("j.pointId"), F.col("j.distanceFromPoint").cast("string"),
+        ),
+        256,
     )
-   
-    event_id = F.when(is_malformed, F.sha2(F.coalesce(F.col("value"), F.lit("")), 256)).otherwise(fingerprint)
 
     return parsed.select(
-        event_id.alias("event_id"),
+        obs_key.alias("obs_key"),
         event_ts.alias("event_ts"),
         F.to_date(F.from_utc_timestamp(event_ts, config.TIMEZONE)).alias("event_date"),
         F.col("j.lineid").alias("lineid"),
@@ -50,6 +51,3 @@ def parse_bronze(bronze: DataFrame) -> DataFrame:
         "ingestion_ts",
         "value",
     )
-def deduplicate(parsed: DataFrame) -> DataFrame:
-
-    return parsed.dropDuplicates(["event_id"])
