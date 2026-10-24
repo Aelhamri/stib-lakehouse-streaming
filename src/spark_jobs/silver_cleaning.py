@@ -103,6 +103,69 @@ def classify(parsed: DataFrame, known_lines: DataFrame, known_stops: DataFrame) 
         .withColumn("quarantined_at", F.current_timestamp())
     )
     return valid, quarantine
+def load_direction_refs(spark, static_dir: Path) -> tuple[DataFrame, DataFrame]:
+    """Références pour retrouver le sens (City / Suburb) d'une observation."""
+    terminus = (
+        spark.read.json(str(static_dir / "line_terminus.jsonl.gz"))
+        .select(
+            F.col("lineid").alias("t_lineid"),
+            base_id(F.col("terminus_pointid")).alias("terminus_base"),
+            F.col("direction").alias("dir_terminus"),
+        )
+        .distinct()
+    )
+    stop_dirs = (
+        spark.read.json(str(static_dir / "line_stops.jsonl.gz"))
+        .select("lineid", base_id(F.col("pointid")).alias("stop_base"), "direction")
+        .distinct()
+        .groupBy("lineid", "stop_base")
+        .agg(
+            F.countDistinct("direction").alias("n_dir"),
+            F.first("direction").alias("dir_stop"),
+        )
+    )
+    return terminus, stop_dirs
+
+
+def resolve_direction(valid: DataFrame, terminus: DataFrame, stop_dirs: DataFrame):
+    """Ajoute `direction` et `direction_method`. Ce qui reste sans sens va en quarantaine."""
+    d = (
+        valid.withColumn("stop_base", base_id(F.col("pointId")))
+        .join(
+            F.broadcast(terminus),
+            (valid["lineid"] == terminus["t_lineid"])
+            & (valid["directionId"] == terminus["terminus_base"]),
+            "left",
+        )
+        .join(F.broadcast(stop_dirs), ["lineid", "stop_base"], "left")
+    )
+
+    d = (
+        d.withColumn(
+            "direction",
+            F.coalesce(
+                F.col("dir_terminus"),
+                F.when(F.col("n_dir") == 1, F.col("dir_stop")),
+            ),
+        )
+        .withColumn(
+            "direction_method",
+            F.when(F.col("dir_terminus").isNotNull(), "EXACT_TERMINUS")
+            .when(F.col("n_dir") == 1, "STOP_UNIQUE_DIRECTION"),
+        )
+    )
+
+    helper = ["t_lineid", "terminus_base", "dir_terminus", "stop_base", "n_dir", "dir_stop"]
+
+    resolved = d.filter(F.col("direction").isNotNull()).drop(*helper)
+    unresolved = (
+        d.filter(F.col("direction").isNull())
+        .drop(*helper, "direction", "direction_method")
+        .withColumn("rejection_reason", F.lit("UNRESOLVED_DIRECTION"))
+        .withColumn("quarantine_stage", F.lit("silver1_direction"))
+        .withColumn("quarantined_at", F.current_timestamp())
+    )
+    return resolved, unresolved
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--bronze", default=str(config.BRONZE_DIR))
@@ -117,8 +180,12 @@ def main(argv=None):
         known_lines, known_stops = load_known_ids(spark, Path(args.static_dir))
         valid, quarantine = classify(parse_bronze(bronze), known_lines, known_stops)
 
-        valid.write.mode("overwrite").partitionBy("event_date").parquet(args.output)
-        quarantine.write.mode("overwrite").parquet(args.quarantine)
+        terminus, stop_dirs = load_direction_refs(spark, Path(args.static_dir))
+        resolved, unresolved = resolve_direction(valid, terminus, stop_dirs)
+        quarantine_all = quarantine.unionByName(unresolved, allowMissingColumns=True)
+
+        resolved.write.mode("overwrite").partitionBy("event_date").parquet(args.output)
+        quarantine_all.write.mode("overwrite").parquet(args.quarantine)
 
         n_valid = spark.read.parquet(args.output).count()
         n_quar = spark.read.parquet(args.quarantine).count()

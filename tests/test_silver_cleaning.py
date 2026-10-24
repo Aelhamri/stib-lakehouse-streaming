@@ -2,7 +2,7 @@ import pytest
 from pyspark.sql import functions as F
 
 from src.spark_jobs.spark_session import build_spark
-from src.spark_jobs.silver_cleaning import base_id, classify, parse_bronze
+from src.spark_jobs.silver_cleaning import base_id, classify, parse_bronze, resolve_direction
 
 
 @pytest.fixture(scope="module")
@@ -61,3 +61,34 @@ def test_nothing_is_lost(spark):
 def test_base_id_strips_trailing_letters(spark):
     df = spark.createDataFrame([("4263F",), ("0636",)], ["p"]).select(base_id(F.col("p")).alias("b"))
     assert [r[0] for r in df.collect()] == ["4263", "0636"]
+def test_resolve_direction_cascade(spark):
+    valid = spark.createDataFrame(
+        [
+            ("12", "9600", "p1"),  # terminus exact -> City
+            ("12", "7777", "p2"),  # arrêt à sens unique -> Suburb
+            ("12", "7777", "p3"),  # arrêt à deux sens -> quarantaine
+            ("12", "7777", "p4"),  # arrêt absent du catalogue -> quarantaine
+            ("12", "9600", "p5"),  # terminus ET arrêt : le terminus doit gagner
+        ],
+        ["lineid", "directionId", "pointId"],
+    )
+    terminus = spark.createDataFrame(
+        [("12", "9600", "City")], ["t_lineid", "terminus_base", "dir_terminus"]
+    )
+    stop_dirs = spark.createDataFrame(
+        [
+            ("12", "p2", 1, "Suburb"),
+            ("12", "p3", 2, "City"),
+            ("12", "p5", 1, "Suburb"),
+        ],
+        ["lineid", "stop_base", "n_dir", "dir_stop"],
+    )
+
+    resolved, unresolved = resolve_direction(valid, terminus, stop_dirs)
+    res = {r["pointId"]: (r["direction"], r["direction_method"]) for r in resolved.collect()}
+
+    assert res["p1"] == ("City", "EXACT_TERMINUS")
+    assert res["p2"] == ("Suburb", "STOP_UNIQUE_DIRECTION")
+    assert res["p5"] == ("City", "EXACT_TERMINUS")
+    assert sorted(r["pointId"] for r in unresolved.collect()) == ["p3", "p4"]
+    assert resolved.count() + unresolved.count() == 5
