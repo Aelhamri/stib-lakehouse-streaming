@@ -19,5 +19,6 @@ def build_spark(app_name: str) -> SparkSession:
         .master("local[*]")
         .appName(app_name)
         .config("spark.sql.session.timeZone", "UTC")
+        .config("spark.driver.memory", "4g")
         .getOrCreate()
     )
