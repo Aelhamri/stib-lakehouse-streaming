@@ -5,11 +5,7 @@ from src.spark_jobs.spark_session import build_spark
 from src.spark_jobs.silver_cleaning import base_id, classify, parse_bronze, resolve_direction
 
 
-@pytest.fixture(scope="module")
-def spark():
-    s = build_spark("test-silver")
-    yield s
-    s.stop()
+
 
 
 def payload(line="12", point="4263F", dist=100.0):

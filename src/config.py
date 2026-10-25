@@ -11,3 +11,10 @@ SILVER_QUARANTINE_DIR = PROJECT_ROOT / "data" / "lakehouse" / "silver" / "positi
 TIMEZONE = "Europe/Brussels"
 
 MAX_DISTANCE_M = 5000  
+
+CRS_WGS84 = "EPSG:4326"
+CRS_METRIC = "EPSG:31370"  # Lambert belge 72, en mètres
+STOP_OFFSETS_PATH = PROJECT_ROOT / "data" / "lakehouse" / "silver" / "ref_stop_offsets.parquet"
+
+SILVER_LOCATED_DIR = PROJECT_ROOT / "data" / "lakehouse" / "silver" / "positions_located"
+SILVER_GEO_QUARANTINE_DIR = PROJECT_ROOT / "data" / "lakehouse" / "silver" / "positions_quarantine_geo"
