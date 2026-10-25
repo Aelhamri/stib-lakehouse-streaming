@@ -26,3 +26,9 @@
 - Ligne 4 : aucun tracé dans aucun sens (206 130 lignes sans position).
 - Le plus long tronçon légitime du réseau est de 4 994 m ; le tronçon Bourget → Aéroport (ligne 12) fait 4 719 m, ce qui explique les grandes distances observées.
 - Résultat Silver 2 : 8 475 073 localisées (7 104 925 `LOCATABLE`, 835 038 `LOCATABLE_APPROX`, 535 110 `NO_SEGMENT`) et 34 930 en quarantaine `BEYOND_SEGMENT`.
+
+## Silver 3 : tracking (port du matching de LocalRtdatahub, sans chain-merge)
+- 7 939 963 observations suivies (celles qui ont un `s_m`), 126 304 tracklets sur 7 jours.
+- Jour de service décalé de 4 h pour ne pas couper les trajets à minuit.
+- Durée médiane 29,5 min, 95e percentile 71 min, cohérent avec le plus long trajet GTFS de 73 min (mémoire).
+- 2,49 % de singletons, 9,29 % de tracklets de moins de 10 observations (fragments), 1,83 % sans progrès.

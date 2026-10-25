@@ -18,3 +18,5 @@ STOP_OFFSETS_PATH = PROJECT_ROOT / "data" / "lakehouse" / "silver" / "ref_stop_o
 
 SILVER_LOCATED_DIR = PROJECT_ROOT / "data" / "lakehouse" / "silver" / "positions_located"
 SILVER_GEO_QUARANTINE_DIR = PROJECT_ROOT / "data" / "lakehouse" / "silver" / "positions_quarantine_geo"
+
+SILVER_TRACKED_DIR = PROJECT_ROOT / "data" / "lakehouse" / "silver" / "positions_tracked"
