@@ -20,3 +20,9 @@
 ## Résultat Silver 1 (9 213 400 lignes en entrée)
 
 - Valides : 9 001 973. Quarantaine : 211 427 (UNKNOWN_LINE 118 328, UNKNOWN_STOP 90 260, EXTREME_DISTANCE 2 839).
+
+## Silver 2 : validation par tronçon
+- Taux de rejet « au-delà du tronçon » : 0,49 % avec un tracé propre, 3,1 % avec le tracé du sens opposé inversé. L'écart indique que les bornes déduites du tracé inversé sont peu fiables : on ne valide que sur les tracés propres et on marque le reste `LOCATABLE_APPROX`.
+- Ligne 4 : aucun tracé dans aucun sens (206 130 lignes sans position).
+- Le plus long tronçon légitime du réseau est de 4 994 m ; le tronçon Bourget → Aéroport (ligne 12) fait 4 719 m, ce qui explique les grandes distances observées.
+- Résultat Silver 2 : 8 475 073 localisées (7 104 925 `LOCATABLE`, 835 038 `LOCATABLE_APPROX`, 535 110 `NO_SEGMENT`) et 34 930 en quarantaine `BEYOND_SEGMENT`.
