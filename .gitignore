@@ -9,3 +9,5 @@ dbt_stib/target/
 dbt_stib/logs/
 dbt_stib/dbt_packages/
 *.duckdb
+.dagster_home/
+tmp*/.

@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: silver
+    description: "Tables Silver produites par les jobs Spark (Parquet partitionné)."
+    tables:
+      - name: positions_tracked
+        description: "Positions avec tracklet_id, une ligne par observation valide."
+        meta:
+          dagster:
+            asset_key: ["silver_tracked"]
+          external_location: "read_parquet('{{ var(\"silver_root\") }}/positions_tracked/*/*.parquet', hive_partitioning = true)"
