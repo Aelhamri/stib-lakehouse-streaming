@@ -38,3 +38,10 @@
 - Heures sans aucun poll : 6 mai 02 h (0 poll). Nuits des 4, 5, 7 mai à 2 h : 4 polls sur 120 ; 3 h : 60 sur 120 (service reprenant vers 3 h 30). Nuits des 8 et 9 mai : 2 h quasi complète.
 - Panne de l'après-midi du 6 mai : 14 h à 90 %, 15 h à 80,8 %, 16 h à 10 %.
 - Piège corrigé : un `group by` ne produit aucune ligne pour une heure sans événement ; un calendrier généré (`generate_series`) + `left join` + test `assert_no_missing_hours` le garantissent.
+
+
+## Gold : vitesses et régularité
+- Le métro n'est observé qu'aux stations (distance 0 à 1 m, aucune position intermédiaire) : la vitesse par pas de 30 s est artificielle (médiane 0,1 km/h, sauts jusqu'à 105 km/h). Méthode retenue : temps de parcours entre arrivées consécutives aux arrêts ; le biais d'arrivée (0 à 30 s) s'annule dans la différence.
+- Vitesses commerciales : métro 1 de 25,7 à 28,5 km/h, bus 71 de 13 à 15 km/h, ligne 12 de 16 à 20 km/h. Le métro varie peu dans la journée, les lignes de surface accélèrent le soir : cohérent avec un site propre.
+- Régularité : métro 1 à 22 h très régulier (cv 0,20), plus irrégulier à 8 h (cv 0,47 à 0,54) ; bus 71 entre 0,33 et 0,69.
+- Leçon de test : un test de plausibilité doit borner par le bas aussi, sinon une médiane à 0 passe.
