@@ -1,0 +1,7 @@
+stib:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../data/gold/stib.duckdb
+      threads: 4

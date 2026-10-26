@@ -1,0 +1,16 @@
+name: stib
+version: "1.0.0"
+config-version: 2
+profile: stib
+
+model-paths: ["models"]
+
+vars:
+  silver_root: "../data/lakehouse/silver"
+
+models:
+  stib:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table

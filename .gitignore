@@ -5,3 +5,7 @@ __pycache__/
 .env
 spark-warehouse/
 metastore_db/
+dbt_stib/target/
+dbt_stib/logs/
+dbt_stib/dbt_packages/
+*.duckdb
