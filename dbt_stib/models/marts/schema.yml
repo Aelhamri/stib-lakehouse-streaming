@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: fct_collection_health
+    description: "Santé de la collecte : polls reçus par heure locale (120 attendus, un toutes les 30 s)."
+    columns:
+      - name: local_hour
+        data_tests: [unique, not_null]
+      - name: polls_received
+        data_tests: [not_null]
+      - name: completeness_pct
+        data_tests: [not_null]

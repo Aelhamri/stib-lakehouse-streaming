@@ -10,7 +10,10 @@ vars:
 
 models:
   stib:
+    intermediate:
+      +materialized: table
     staging:
       +materialized: view
     marts:
       +materialized: table
+      

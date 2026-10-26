@@ -32,3 +32,9 @@
 - Jour de service décalé de 4 h pour ne pas couper les trajets à minuit.
 - Durée médiane 29,5 min, 95e percentile 71 min, cohérent avec le plus long trajet GTFS de 73 min (mémoire).
 - 2,49 % de singletons, 9,29 % de tracklets de moins de 10 observations (fragments), 1,83 % sans progrès.
+
+## Gold : fct_collection_health
+- Un poll n'est détecté que s'il contient au moins un véhicule : un flux vide (pas de service) est indiscernable d'un collecteur arrêté. Recommandation : journal de polls (heartbeat) côté collecteur.
+- Heures sans aucun poll : 6 mai 02 h (0 poll). Nuits des 4, 5, 7 mai à 2 h : 4 polls sur 120 ; 3 h : 60 sur 120 (service reprenant vers 3 h 30). Nuits des 8 et 9 mai : 2 h quasi complète.
+- Panne de l'après-midi du 6 mai : 14 h à 90 %, 15 h à 80,8 %, 16 h à 10 %.
+- Piège corrigé : un `group by` ne produit aucune ligne pour une heure sans événement ; un calendrier généré (`generate_series`) + `left join` + test `assert_no_missing_hours` le garantissent.
