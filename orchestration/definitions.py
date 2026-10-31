@@ -7,6 +7,7 @@ from dagster_dbt import DagsterDbtTranslator, DbtCliResource, DbtProject, dbt_as
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DBT_DIR = PROJECT_ROOT / "dbt_stib"
+GOLD_TABLES = ["fct_collection_health", "fct_line_speeds", "fct_headway_regularity"]
 
 dbt_project = DbtProject(project_dir=DBT_DIR, profiles_dir=DBT_DIR)
 dbt_project.prepare_if_dev()
@@ -48,7 +49,13 @@ def stib_dbt_models(context: AssetExecutionContext, dbt: DbtCliResource):
     yield from dbt.cli(["build"], context=context).stream()
 
 
+
+
+@asset(deps=[AssetKey(t) for t in GOLD_TABLES], group_name="serving")
+def gold_exports(context: AssetExecutionContext) -> None:
+    run_module(context, "src.export_gold")
+
 defs = Definitions(
-    assets=[bronze_positions, silver_cleaned, silver_located, silver_tracked, stib_dbt_models],
+    assets=[bronze_positions, silver_cleaned, silver_located, silver_tracked, stib_dbt_models, gold_exports, ],
     resources={"dbt": DbtCliResource(project_dir=DBT_DIR, profiles_dir=DBT_DIR)},
 )

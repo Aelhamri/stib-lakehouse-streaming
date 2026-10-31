@@ -20,3 +20,7 @@ SILVER_LOCATED_DIR = PROJECT_ROOT / "data" / "lakehouse" / "silver" / "positions
 SILVER_GEO_QUARANTINE_DIR = PROJECT_ROOT / "data" / "lakehouse" / "silver" / "positions_quarantine_geo"
 
 SILVER_TRACKED_DIR = PROJECT_ROOT / "data" / "lakehouse" / "silver" / "positions_tracked"
+
+GOLD_DB_PATH = PROJECT_ROOT / "data" / "gold" / "stib.duckdb"
+EXPORT_DIR = PROJECT_ROOT / "data" / "exports"
+GOLD_TABLES = ["fct_collection_health", "fct_line_speeds", "fct_headway_regularity"]
