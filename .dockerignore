@@ -1,0 +1,12 @@
+.git
+.venv
+data/
+__pycache__/
+*.pyc
+.pytest_cache/
+dbt_stib/target/
+dbt_stib/logs/
+logs/
+*.duckdb
+.dagster_home/
+spark-warehouse/
