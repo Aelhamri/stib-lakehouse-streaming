@@ -1,4 +1,6 @@
 # stib-lakehouse-streaming
+![CI](https://github.com/Aelhamri/stib-lakehouse-streaming/actions/workflows/ci.yml/badge.svg?branch=dev)
+
 
 A batch medallion pipeline (Bronze / Silver / Gold) that turns one week of raw real-time vehicle positions from the Brussels public transport operator (STIB/MIVB) into three analytical tables: commercial speed, headway regularity and data-collection health.
 
