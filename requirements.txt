@@ -1,0 +1,23 @@
+# Direct dependencies, pinned to the versions the project was developed with (Python 3.11).
+# Spark 4 needs Java 17 or newer.
+
+# Spark jobs (Bronze / Silver)
+pyspark==4.0.1
+pandas==3.1.0
+numpy==2.4.6
+pyarrow==26.0.0
+shapely==2.2.0
+pyproj==3.7.2
+
+# Gold (dbt + DuckDB) and export
+dbt-core==1.12.6
+dbt-duckdb==1.11.0
+duckdb==2.0.0
+
+# Orchestration
+dagster==1.13.26
+dagster-dbt==0.29.26
+dagster-webserver==1.13.26
+
+# Tests
+pytest==9.1.1
