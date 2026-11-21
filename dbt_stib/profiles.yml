@@ -3,5 +3,5 @@ stib:
   outputs:
     dev:
       type: duckdb
-      path: ../data/gold/stib.duckdb
+      path: "{{ env_var('DBT_DUCKDB_PATH', '../data/gold/stib.duckdb') }}"
       threads: 4

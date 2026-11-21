@@ -7,6 +7,6 @@ sources:
       - name: positions_tracked
         description: "Positions avec tracklet_id, une ligne par observation valide."
         meta:
+          external_location: "read_parquet('{{ env_var('SILVER_POSITIONS_PATH', '../data/lakehouse/silver/positions_tracked') }}/*/*.parquet', hive_partitioning = true)"
           dagster:
             asset_key: ["silver_tracked"]
-          external_location: "read_parquet('{{ var(\"silver_root\") }}/positions_tracked/*/*.parquet', hive_partitioning = true)"
