@@ -18,3 +18,6 @@ logs/
 .vscode/
 .idea/
 tmp*/
+
+# Spark/Hadoop checksum files
+*.crc
