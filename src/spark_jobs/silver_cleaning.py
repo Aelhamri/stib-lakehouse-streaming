@@ -176,7 +176,7 @@ def main(argv=None):
 
     spark = build_spark("silver-cleaning")
     try:
-        bronze = spark.read.parquet(args.bronze)
+        bronze = spark.read.format("delta").load(args.bronze)
         known_lines, known_stops = load_known_ids(spark, Path(args.static_dir))
         valid, quarantine = classify(parse_bronze(bronze), known_lines, known_stops)
 
@@ -184,15 +184,13 @@ def main(argv=None):
         resolved, unresolved = resolve_direction(valid, terminus, stop_dirs)
         quarantine_all = quarantine.unionByName(unresolved, allowMissingColumns=True)
 
-        resolved.write.mode("overwrite").partitionBy("event_date").parquet(args.output)
-        quarantine_all.write.mode("overwrite").parquet(args.quarantine)
+        resolved.write.format("delta").mode("overwrite").partitionBy("event_date").save(args.output)
+        quarantine_all.write.format("delta").mode("overwrite").save(args.quarantine)
 
-        n_valid = spark.read.parquet(args.output).count()
-        n_quar = spark.read.parquet(args.quarantine).count()
+        n_valid = spark.read.format("delta").load(args.output).count()
+        n_quar = spark.read.format("delta").load(args.quarantine).count()
         print(f"Valides: {n_valid:,} | Quarantaine: {n_quar:,} | Somme: {n_valid + n_quar:,}")
     finally:
         spark.stop()
-
-
 if __name__ == "__main__":
     main()

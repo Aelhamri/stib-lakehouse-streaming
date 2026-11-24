@@ -97,20 +97,19 @@ def main(argv=None):
 
     spark = build_spark("silver-geolocation")
     try:
-        silver = spark.read.parquet(args.silver)
+        silver = spark.read.format("delta").load(args.silver)
         offsets = load_offsets(spark, args.offsets)
         positioned, quarantine = locate_on_segment(silver, offsets)
         located = add_coordinates(positioned, build_shapes_m(Path(args.static_dir)))
 
-        located.write.mode("overwrite").partitionBy("event_date").parquet(args.output)
-        quarantine.write.mode("overwrite").parquet(args.quarantine)
+        located.write.format("delta").mode("overwrite").partitionBy("event_date").save(args.output)
+        quarantine.write.format("delta").mode("overwrite").save(args.quarantine)
 
-        n_loc = spark.read.parquet(args.output).count()
-        n_q = spark.read.parquet(args.quarantine).count()
+        n_loc = spark.read.format("delta").load(args.output).count()
+        n_q = spark.read.format("delta").load(args.quarantine).count()
         print(f"Localisées : {n_loc:,} | Quarantaine : {n_q:,} | Somme : {n_loc + n_q:,}")
     finally:
         spark.stop()
-
 
 if __name__ == "__main__":
     main()

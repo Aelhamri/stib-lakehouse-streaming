@@ -45,9 +45,9 @@ def main(argv=None):
 
     spark = build_spark("silver-tracking")
     try:
-        tracked = add_tracklets(spark.read.parquet(args.input))
-        tracked.write.mode("overwrite").partitionBy("service_date").parquet(args.output)
-        n = spark.read.parquet(args.output).count()
+        tracked = add_tracklets(spark.read.format("delta").load(args.input))
+        tracked.write.format("delta").mode("overwrite").partitionBy("service_date").save(args.output)
+        n = spark.read.format("delta").load(args.output).count()
         print(f"Observations suivies : {n:,}")
     finally:
         spark.stop()
