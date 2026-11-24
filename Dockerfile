@@ -11,6 +11,10 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Jars Delta : on démarre une session Spark vide pendant le build pour que Maven
+# les télécharge UNE fois et qu'ils soient dans l'image (marche ensuite sans internet).
+RUN python -c "from pyspark.sql import SparkSession; from delta import configure_spark_with_delta_pip; configure_spark_with_delta_pip(SparkSession.builder.master('local[1]')).getOrCreate().stop()"
+
 # Le code ensuite : il change souvent, on le met en dernier.
 COPY . .
 
