@@ -19,7 +19,9 @@
 
 ## Résultat Silver 1 (9 213 400 lignes en entrée)
 
-- Valides : 9 001 973. Quarantaine : 211 427 (UNKNOWN_LINE 118 328, UNKNOWN_STOP 90 260, EXTREME_DISTANCE 2 839).
+- Valides : 8 510 003. Quarantaine : 703 397 (UNRESOLVED_DIRECTION 491 970, UNKNOWN_LINE 118 328, UNKNOWN_STOP 90 260, EXTREME_DISTANCE 2 839).
+- La première cause (5,3 % du brut) est le sens irrésolu, surtout sur les lignes 4, 50, 37, 10 et 82. Pas encore analysée.
+- Rejeu complet depuis le brut le 24 novembre 2026 : mêmes comptes à chaque couche.
 
 ## Silver 2 : validation par tronçon
 - Taux de rejet « au-delà du tronçon » : 0,49 % avec un tracé propre, 3,1 % avec le tracé du sens opposé inversé. L'écart indique que les bornes déduites du tracé inversé sont peu fiables : on ne valide que sur les tracés propres et on marque le reste `LOCATABLE_APPROX`.
@@ -45,3 +47,10 @@
 - Vitesses commerciales : métro 1 de 25,7 à 28,5 km/h, bus 71 de 13 à 15 km/h, ligne 12 de 16 à 20 km/h. Le métro varie peu dans la journée, les lignes de surface accélèrent le soir : cohérent avec un site propre.
 - Régularité : métro 1 à 22 h très régulier (cv 0,20), plus irrégulier à 8 h (cv 0,47 à 0,54) ; bus 71 entre 0,33 et 0,69.
 - Leçon de test : un test de plausibilité doit borner par le bas aussi, sinon une médiane à 0 passe.
+
+## Gold : restitution (Power BI)
+
+- **Vitesse commerciale** : le métro (lignes 1 et 6) reste stable entre 26 et 28 km/h quelle que soit l'heure (voie dédiée). Les bus (12, 71) ralentissent aux heures de pointe (6 h à 8 h, 17 h à 18 h) et roulent plus vite la nuit.
+- **Bunching** : le top 10 des lignes les plus touchées est composé de lignes de surface (bus et trams), aucune ligne de métro. Limites connues : moyenne non pondérée par `n_headways`, et les fragments de tracklets (9,29 %) peuvent gonfler artificiellement la mesure. Le chain-merge du mémoire corrigerait ce biais.
+- **Santé de la collecte** : les creux nocturnes sont structurels (pas de service, donc aucun poll détecté). Un creux diurne le 6 mai (vers 16 h, à préciser) correspond à une panne probable du collecteur. Distinguer « panne » de « pas de service » demande un heartbeat côté collecte (un journal écrit à chaque poll, même vide).
+- **Restitution** : l'export Parquet/CSV est un asset Dagster en aval des modèles `fct_*`. Parquet est préféré au CSV pour Power BI (types conservés, pas de problème de décimales en locale française, pas de verrou DuckDB). Tableau de bord : `bi/stib_dashboard.pbix`, capture dans `docs/img/powerbi_dashboard.png`.

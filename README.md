@@ -43,7 +43,7 @@ flowchart LR
 
 ## Key design choices
 
-- **Quarantine with a rejection reason.** Invalid rows are never deleted: they are written to a separate dataset with `rejection_reason` (`UNKNOWN_LINE`, `UNKNOWN_STOP`, `EXTREME_DISTANCE`, `UNRESOLVED_DIRECTION`, `BEYOND_SEGMENT`), the stage that rejected them and a timestamp. On the 9,213,400 input rows of Silver 1: 9,001,973 valid, 211,427 quarantined. Row counts always add up, and a rule can be revised without re-reading the source.
+On the 9,213,400 input rows of Silver 1: 8,510,003 valid and 703,397 quarantined (`UNRESOLVED_DIRECTION` 491,970, `UNKNOWN_LINE` 118,328, `UNKNOWN_STOP` 90,260, `EXTREME_DISTANCE` 2,839). Silver 2 quarantines 34,930 more (`BEYOND_SEGMENT`). Row counts always add up, and a rule can be revised without re-reading the source. A full replay from the raw files reproduces the same row counts at every layer (checked on 24 November 2026, about 5.5 minutes in Docker).
 - **No content-based deduplication.** 3.35 % of rows look like duplicates, but 98 % of them are at distance 0 (several vehicles at the same stop), so they are kept. Details in [docs/findings.md](docs/findings.md).
 - **Direction resolution cascade.** First by exact terminus match, then by "this stop belongs to only one direction". Each row records the method used (`direction_method`).
 - **Lambert 72 (EPSG:31370).** Distances are computed in a metric projection, not on raw latitude / longitude. Each stop-to-stop segment gets its real length, which replaced a provisional 5,000 m threshold.
