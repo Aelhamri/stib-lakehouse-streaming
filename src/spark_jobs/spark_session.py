@@ -2,7 +2,7 @@ import os
 import sys
 
 from pyspark.sql import SparkSession
-
+from delta import configure_spark_with_delta_pip
 
 def build_spark(app_name: str) -> SparkSession:
     os.environ["PYSPARK_PYTHON"] = sys.executable
@@ -20,11 +20,12 @@ def build_spark(app_name: str) -> SparkSession:
         .appName(app_name)
         .config("spark.sql.session.timeZone", "UTC")
         .config("spark.driver.memory", driver_memory)
+        .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+        .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
     )
 
-    # Optionnel : réduire les partitions de shuffle (200 par défaut) pour les petits jeux de données.
     shuffle = os.environ.get("SPARK_SHUFFLE_PARTITIONS")
     if shuffle:
         builder = builder.config("spark.sql.shuffle.partitions", shuffle)
 
-    return builder.getOrCreate()
+    return configure_spark_with_delta_pip(builder).getOrCreate()

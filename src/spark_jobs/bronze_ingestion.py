@@ -30,8 +30,8 @@ def main(argv: list[str] | None = None) -> None:
     spark = build_spark("bronze-ingestion")
     try:
         bronze = add_metadata(read_raw(spark, args.input_dir))
-        bronze.write.mode("overwrite").parquet(args.output)
-        n = spark.read.parquet(args.output).count()
+        bronze.write.format("delta").mode("overwrite").save(args.output)
+        n = spark.read.format("delta").load(args.output).count()
         print(f"[bronze] {n:,} lignes écrites dans {args.output}")
     finally:
         spark.stop()

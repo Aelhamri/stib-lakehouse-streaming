@@ -21,3 +21,5 @@ dagster-webserver==1.13.26
 
 # Tests
 pytest==9.1.1
+
+delta-spark==4.0.1
