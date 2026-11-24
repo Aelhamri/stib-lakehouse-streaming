@@ -2,6 +2,8 @@ stib:
   target: dev
   outputs:
     dev:
+      extensions:
+        - delta
       type: duckdb
       path: "{{ env_var('DBT_DUCKDB_PATH', '../data/gold/stib.duckdb') }}"
       threads: 4

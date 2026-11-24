@@ -28,7 +28,7 @@ jobs:
   dbt:
     runs-on: ubuntu-latest
     env:
-      SILVER_POSITIONS_PATH: ../tests/fixtures/silver/positions_tracked
+      SILVER_POSITIONS_PATH: ../tests/fixtures/silver_delta/positions_tracked
       DBT_DUCKDB_PATH: /tmp/stib_ci.duckdb
     steps:
       - uses: actions/checkout@v4
