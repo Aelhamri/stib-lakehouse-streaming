@@ -43,7 +43,7 @@ flowchart LR
 
 ## Key design choices
 
-On the 9,213,400 input rows of Silver 1: 8,510,003 valid and 703,397 quarantined (`UNRESOLVED_DIRECTION` 491,970, `UNKNOWN_LINE` 118,328, `UNKNOWN_STOP` 90,260, `EXTREME_DISTANCE` 2,839). Silver 2 quarantines 34,930 more (`BEYOND_SEGMENT`). Row counts always add up, and a rule can be revised without re-reading the source. A full replay from the raw files reproduces the same row counts at every layer (checked on 24 November 2026, about 5.5 minutes in Docker), and the same counts were checked again after the move to Delta.
+On the 9,213,400 input rows of Silver 1: 8,510,003 valid and 703,397 quarantined (`UNRESOLVED_DIRECTION` 491,970, `UNKNOWN_LINE` 118,328, `UNKNOWN_STOP` 90,260, `EXTREME_DISTANCE` 2,839). Silver 2 quarantines 34,930 more (`BEYOND_SEGMENT`). Row counts always add up, and a rule can be revised without re-reading the source. A full replay from the raw files reproduces the same row counts at every layer, first checked on 24 November 2026 on Parquet (about 5.5 minutes in Docker), then again on Delta on 25 November 2026 (about 7 minutes: Bronze and Silver 1 run locally, Silver 2 and 3 in Docker).
 
 - **Delta Lake for Bronze and Silver.** Every job writes with `overwrite`; Delta makes that write atomic (a crashed job leaves the previous version readable, because files only count once they appear in `_delta_log`). The log also allows time travel and schema enforcement.
 - **No content-based deduplication.** 3.35 % of rows look like duplicates, but 98 % of them are at distance 0 (several vehicles at the same stop), so they are kept. Details in [docs/findings.md](docs/findings.md).
