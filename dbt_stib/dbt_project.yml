@@ -5,9 +5,6 @@ profile: stib
 
 model-paths: ["models"]
 
-vars:
-  silver_root: "../data/lakehouse/silver"
-
 models:
   stib:
     intermediate:

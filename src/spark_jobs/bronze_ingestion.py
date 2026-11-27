@@ -22,7 +22,7 @@ def add_metadata(df: DataFrame) -> DataFrame:
     .withColumn("ingestion_date", F.to_date("ingestion_ts")))                           
 
 def main(argv: list[str] | None = None) -> None:
-    parser = argparse.ArgumentParser(description="Ingestion Bronze (fichiers bruts -> Parquet)")
+    parser = argparse.ArgumentParser(description="Ingestion Bronze (fichiers bruts -> Delta)")
     parser.add_argument("--input-dir", default=str(config.RAW_DIR))
     parser.add_argument("--output", default=str(config.BRONZE_DIR))
     args = parser.parse_args(argv)

@@ -1,5 +1,5 @@
 # stib-lakehouse-streaming
-![CI](https://github.com/Aelhamri/stib-lakehouse-streaming/actions/workflows/ci.yml/badge.svg?branch=dev)
+![CI](https://github.com/Aelhamri/stib-lakehouse-streaming/actions/workflows/ci.yml/badge.svg?branch=main)
 
 
 A batch medallion pipeline (Bronze / Silver / Gold) that turns one week of raw real-time vehicle positions from the Brussels public transport operator (STIB/MIVB) into three analytical tables: commercial speed, headway regularity and data-collection health. Bronze and Silver are stored as **Delta Lake** tables.
@@ -24,7 +24,7 @@ flowchart LR
     S2 --> S3["Silver 3 (Delta)<br/>vehicle tracking<br/>(tracklets)"]
     S1 -. rejected rows .-> Q["Quarantine (Delta)<br/>+ rejection_reason"]
     S2 -. rejected rows .-> Q
-    S3 --> G["Gold (dbt + DuckDB)<br/>3 fct_ tables, 18 tests"]
+    S3 --> G["Gold (dbt + DuckDB)<br/>3 fct_ tables, 17 tests"]
     G --> E["Parquet / CSV export"]
     E --> PBI["Power BI dashboard"]
     D["Dagster<br/>orchestrates every step"] -.-> B
@@ -37,7 +37,7 @@ flowchart LR
 | Silver 1 | PySpark, Delta | Parses the JSON, checks lines and stops against the static data, resolves the direction, sends invalid rows to quarantine. |
 | Silver 2 | PySpark + pandas UDF, Delta | Projects every position onto the line shape (Belgian Lambert 72, metres) to get a curvilinear position `s_m`. |
 | Silver 3 | PySpark + pandas UDF, Delta | Rebuilds vehicle trajectories ("tracklets") with a greedy curvilinear matching, per line / direction / service day. |
-| Gold | dbt Core + DuckDB | Reads Silver 3 with `delta_scan` (DuckDB `delta` extension). 6 models (1 staging view, 2 intermediate tables, 3 marts) and 18 tests. |
+| Gold | dbt Core + DuckDB | Reads Silver 3 with `delta_scan` (DuckDB `delta` extension). 6 models (1 staging view, 2 intermediate tables, 3 marts) and 17 tests. |
 | Serving | DuckDB, Parquet, Power BI | `src/export_gold.py` exports the 3 marts for BI. |
 | Orchestration | Dagster | One asset per Spark job, dbt models as assets, export as the last asset. |
 

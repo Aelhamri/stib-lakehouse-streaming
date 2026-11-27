@@ -2,7 +2,7 @@ version: 2
 
 sources:
   - name: silver
-    description: "Tables Silver produites par les jobs Spark (Parquet partitionné)."
+    description: "Tables Silver produites par les jobs Spark (Delta, partitionné par jour de service)."
     tables:
       - name: positions_tracked
         description: "Positions avec tracklet_id, une ligne par observation valide."
